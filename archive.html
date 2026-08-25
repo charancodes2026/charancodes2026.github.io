@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Stacks — a personal archive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eceef1;
+    --surface:#ffffff;
+    --ink:#14181f;
+    --ink-soft:#565f6d;
+    --line:#d4d8de;
+    --accent:#3457d5;
+    --accent-soft:#e3e9fc;
+    --amber:#e0952c;
+    --amber-soft:#fbf0dd;
+    --teal:#1b8c78;
+    --teal-soft:#dff2ee;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px);
+    background-size: 100% 42px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:0 32px 80px;}
+
+  /* HEADER */
+  header{
+    padding:56px 0 28px;
+    border-bottom:3px solid var(--ink);
+    margin-bottom:32px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .title-block .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:8px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:56px;
+    line-height:.95;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  h1 em{font-style:italic;font-weight:400;color:var(--accent);}
+  .stats{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    text-align:right;
+    line-height:1.7;
+  }
+  .stats b{color:var(--ink);font-weight:600;}
+
+  /* TOOLBAR */
+  .toolbar{
+    display:flex;
+    gap:12px;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .search{
+    flex:1;
+    min-width:200px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    padding:12px 14px;
+    border:1.5px solid var(--ink);
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .search:focus{outline:none;border-color:var(--accent);}
+  .chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    padding:8px 12px;
+    border:1.5px solid var(--line);
+    background:var(--surface);
+    cursor:pointer;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .chip.active{border-color:var(--ink);color:var(--ink);background:var(--accent-soft);}
+  .btn-add{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 20px;
+    background:var(--ink);
+    color:#fff;
+    border:1.5px solid var(--ink);
+    cursor:pointer;
+  }
+  .btn-add:hover{background:var(--accent);border-color:var(--accent);}
+
+  /* GRID */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+    gap:20px;
+  }
+  .card{
+    background:var(--surface);
+    border:1.5px solid var(--ink);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    box-shadow:4px 4px 0 var(--line);
+    transition:box-shadow .15s ease, transform .15s ease;
+  }
+  .card:hover{box-shadow:4px 4px 0 var(--accent); transform:translate(-1px,-1px);}
+  .card-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    border-bottom:1.5px solid var(--line);
+  }
+  .callno{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--ink-soft);
+  }
+  .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    padding:3px 8px;
+    border-radius:20px;
+  }
+  .tag.code{background:var(--teal-soft);color:var(--teal);}
+  .tag.link{background:var(--amber-soft);color:var(--amber);}
+  .card-body{padding:16px;flex:1;}
+  .card-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:19px;
+    margin:0 0 8px;
+    line-height:1.2;
+  }
+  .card-desc{
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.5;
+    margin:0 0 10px;
+  }
+  .card-snippet{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    background:#11151c;
+    color:#d7ddea;
+    padding:10px 12px;
+    max-height:120px;
+    overflow:hidden;
+    white-space:pre-wrap;
+    word-break:break-word;
+    position:relative;
+  }
+  .card-snippet::after{
+    content:"";
+    position:absolute;
+    bottom:0;left:0;right:0;height:28px;
+    background:linear-gradient(transparent, #11151c);
+  }
+  .card-link{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--accent);
+    text-decoration:none;
+    word-break:break-all;
+    display:block;
+    border:1px solid var(--line);
+    padding:10px 12px;
+  }
+  .card-link:hover{border-color:var(--accent);}
+  .card-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 14px;
+    border-top:1.5px solid var(--line);
+  }
+  .lang-tags{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .card-actions button{
+    background:none;border:none;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-left:10px;
+    text-decoration:underline;
+  }
+  .card-actions button:hover{color:var(--accent);}
+
+  .empty{
+    grid-column:1/-1;
+    text-align:center;
+    padding:80px 20px;
+    color:var(--ink-soft);
+    font-family:'JetBrains Mono',monospace;
+    border:1.5px dashed var(--line);
+  }
+  .empty b{display:block;font-family:'Fraunces',serif;font-size:22px;color:var(--ink);margin-bottom:8px;font-weight:600;}
+
+  /* MODAL */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,24,31,.5);
+    display:none;align-items:flex-start;justify-content:center;
+    padding:60px 20px;z-index:50;overflow-y:auto;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--surface);
+    border:2px solid var(--ink);
+    width:100%;max-width:560px;
+    box-shadow:6px 6px 0 var(--ink);
+  }
+  .modal-head{
+    padding:20px 24px;border-bottom:1.5px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .modal-head h2{font-family:'Fraunces',serif;font-size:24px;margin:0;font-weight:600;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink-soft);}
+  .modal-body{padding:24px;}
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;font-family:'JetBrains Mono',monospace;
+    font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--ink-soft);margin-bottom:6px;
+  }
+  .field input, .field textarea, .field select{
+    width:100%;padding:10px 12px;border:1.5px solid var(--line);
+    font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);
+    color:var(--ink);
+  }
+  .field textarea{font-family:'JetBrains Mono',monospace;min-height:120px;resize:vertical;}
+  .field input:focus, .field textarea:focus, .field select:focus{outline:none;border-color:var(--accent);}
+  .type-toggle{display:flex;gap:8px;margin-bottom:18px;}
+  .type-toggle button{
+    flex:1;padding:10px;font-family:'JetBrains Mono',monospace;
+    font-size:12px;text-transform:uppercase;letter-spacing:.08em;
+    border:1.5px solid var(--line);background:var(--bg);cursor:pointer;color:var(--ink-soft);
+  }
+  .type-toggle button.active{border-color:var(--ink);background:var(--ink);color:#fff;}
+  .modal-foot{padding:16px 24px;border-top:1.5px solid var(--line);display:flex;justify-content:flex-end;gap:10px;}
+  .btn-secondary{
+    padding:10px 18px;background:none;border:1.5px solid var(--line);
+    cursor:pointer;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink-soft);
+  }
+  .btn-primary{
+    padding:10px 18px;background:var(--accent);border:1.5px solid var(--accent);
+    color:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;
+  }
+  @media (max-width:600px){
+    h1{font-size:38px;}
+    .wrap{padding:0 18px 60px;}
+    header{padding-top:36px;}
+    .stats{text-align:left;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title-block">
+      <span class="eyebrow">personal accession registry</span>
+      <h1>The <em>Stacks</em></h1>
+    </div>
+    <div class="stats" id="stats">— items catalogued</div>
+  </header>
+
+  <div class="toolbar">
+    <input class="search" id="search" placeholder="search title, tag, or content…">
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="code">Code</button>
+    <button class="chip" data-filter="link">Links</button>
+    <button class="btn-add" id="openAdd">+ New entry</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">New entry</h2>
+      <button class="modal-close" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="type-toggle">
+        <button type="button" class="active" data-type="code">Code snippet</button>
+        <button type="button" data-type="link">Web link</button>
+      </div>
+      <div class="field">
+        <label>Title</label>
+        <input id="fTitle" placeholder="e.g. Debounce helper">
+      </div>
+      <div class="field" id="fieldUrl" style="display:none;">
+        <label>URL</label>
+        <input id="fUrl" placeholder="https://…">
+      </div>
+      <div class="field" id="fieldContent">
+        <label>Code</label>
+        <textarea id="fContent" placeholder="paste your code here…"></textarea>
+      </div>
+      <div class="field">
+        <label>Note (optional)</label>
+        <input id="fDesc" placeholder="what is this / why it's saved">
+      </div>
+      <div class="field">
+        <label>Tags (comma separated)</label>
+        <input id="fTags" placeholder="e.g. javascript, utils, react">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" id="cancelModal">Cancel</button>
+      <button class="btn-primary" id="saveEntry">Save entry</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let entries = [];
+let editingId = null;
+let currentType = 'code';
+let currentFilter = 'all';
+const STORAGE_KEY = 'stacks:entries';
+
+async function load(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY);
+    entries = res && res.value ? JSON.parse(res.value) : [];
+  }catch(e){
+    entries = [];
+  }
+  render();
+}
+
+async function save(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(entries));
+  }catch(e){
+    console.error('storage error', e);
+  }
+}
+
+function callNumber(i){
+  return 'STK.' + String(i+1).padStart(4,'0');
+}
+
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function render(){
+  const grid = document.getElementById('grid');
+  const search = document.getElementById('search').value.toLowerCase().trim();
+
+  let list = entries.map((e, idx) => ({...e, _idx: idx}));
+  if(currentFilter !== 'all'){
+    list = list.filter(e => e.type === currentFilter);
+  }
+  if(search){
+    list = list.filter(e =>
+      (e.title||'').toLowerCase().includes(search) ||
+      (e.desc||'').toLowerCase().includes(search) ||
+      (e.tags||[]).join(' ').toLowerCase().includes(search) ||
+      (e.content||'').toLowerCase().includes(search) ||
+      (e.url||'').toLowerCase().includes(search)
+    );
+  }
+
+  document.getElementById('stats').innerHTML =
+    `<b>${entries.length}</b> catalogued &nbsp;·&nbsp; <b>${entries.filter(e=>e.type==='code').length}</b> code &nbsp;·&nbsp; <b>${entries.filter(e=>e.type==='link').length}</b> links`;
+
+  if(list.length === 0){
+    grid.innerHTML = `<div class="empty"><b>Nothing here yet</b>${entries.length ? 'No entries match your search.' : 'Add your first code snippet or link to begin the archive.'}</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.slice().reverse().map(e => {
+    const tags = (e.tags||[]).map(t=>`<span class="lang-tags">#${escapeHtml(t)}</span>`).join(' ');
+    const body = e.type === 'code'
+      ? `<div class="card-snippet">${escapeHtml(e.content||'')}</div>`
+      : `<a class="card-link" href="${escapeHtml(e.url||'#')}" target="_blank" rel="noopener">${escapeHtml(e.url||'')}</a>`;
+    return `
+      <div class="card">
+        <div class="card-head">
+          <span class="callno">${callNumber(e._idx)}</span>
+          <span class="tag ${e.type}">${e.type === 'code' ? 'Code' : 'Link'}</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">${escapeHtml(e.title||'Untitled')}</h3>
+          ${e.desc ? `<p class="card-desc">${escapeHtml(e.desc)}</p>` : ''}
+          ${body}
+        </div>
+        <div class="card-foot">
+          <div>${tags}</div>
+          <div class="card-actions">
+            <button onclick="editEntry(${e._idx})">edit</button>
+            <button onclick="deleteEntry(${e._idx})">delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openModal(){
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('open');
+  editingId = null;
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fUrl').value = '';
+  document.getElementById('fContent').value = '';
+  document.getElementById('fDesc').value = '';
+  document.getElementById('fTags').value = '';
+  setType('code');
+  document.getElementById('modalTitle').textContent = 'New entry';
+}
+
+function setType(t){
+  currentType = t;
+  document.querySelectorAll('.type-toggle button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.type === t);
+  });
+  document.getElementById('fieldUrl').style.display = t === 'link' ? 'block' : 'none';
+  document.getElementById('fieldContent').style.display = t === 'code' ? 'block' : 'none';
+  document.getElementById('fContent').previousElementSibling ? null : null;
+}
+
+window.editEntry = function(idx){
+  const e = entries[idx];
+  editingId = idx;
+  setType(e.type);
+  document.getElementById('fTitle').value = e.title || '';
+  document.getElementById('fUrl').value = e.url || '';
+  document.getElementById('fContent').value = e.content || '';
+  document.getElementById('fDesc').value = e.desc || '';
+  document.getElementById('fTags').value = (e.tags||[]).join(', ');
+  document.getElementById('modalTitle').textContent = 'Edit entry';
+  openModal();
+};
+
+window.deleteEntry = async function(idx){
+  if(!confirm('Delete this entry?')) return;
+  entries.splice(idx, 1);
+  await save();
+  render();
+};
+
+document.getElementById('openAdd').addEventListener('click', () => {
+  editingId = null;
+  openModal();
+});
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('cancelModal').addEventListener('click', closeModal);
+document.getElementById('overlay').addEventListener('click', (e) => {
+  if(e.target.id === 'overlay') closeModal();
+});
+document.querySelectorAll('.type-toggle button').forEach(b=>{
+  b.addEventListener('click', () => setType(b.dataset.type));
+});
+document.querySelectorAll('.toolbar .chip').forEach(chip=>{
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.toolbar .chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFilter = chip.dataset.filter;
+    render();
+  });
+});
+document.getElementById('search').addEventListener('input', render);
+
+document.getElementById('saveEntry').addEventListener('click', async () => {
+  const title = document.getElementById('fTitle').value.trim();
+  const url = document.getElementById('fUrl').value.trim();
+  const content = document.getElementById('fContent').value;
+  const desc = document.getElementById('fDesc').value.trim();
+  const tags = document.getElementById('fTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+
+  if(!title){ alert('Please add a title.'); return; }
+  if(currentType === 'link' && !url){ alert('Please add a URL.'); return; }
+  if(currentType === 'code' && !content){ alert('Please add some code.'); return; }
+
+  const entry = { type: currentType, title, desc, tags, url, content };
+
+  if(editingId !== null){
+    entries[editingId] = entry;
+  } else {
+    entries.push(entry);
+  }
+  await save();
+  render();
+  closeModal();
+});
+
+load();
+</script>
+</body>
+</html>
